@@ -57,35 +57,36 @@ def chat():
                     image_url = f"/uploads/{filename}"
                     logger.debug(f"이미지 저장: {filepath}")
         
-        # 간단한 응답 생성 (실제로는 AI 모델을 사용할 수 있음)
-        ai_responses = [
-            "이 레시피는 매우 맛있어 보이네요! 소금을 조금 더 넣어보세요.",
-            "이 요리에는 올리브 오일을 사용하는 것이 좋을 것 같아요.",
-            "요리 시간을 5분 정도 더 늘리면 더 맛있어질 것 같습니다.",
-            "재료의 신선도가 매우 중요해요. 신선한 재료를 사용하세요.",
-            "이 요리와 잘 어울리는 와인은 화이트 와인입니다.",
-            "조리 온도를 조금 낮추고 시간을 늘리는 것이 좋을 것 같아요.",
-            "이 레시피에 마늘을 추가하면 풍미가 더 좋아질 것 같아요.",
-            "다음에는 허브를 조금 더 넣어보세요. 향이 더 풍부해질 거예요.",
-            "이 요리는 저온에서 오래 조리하는 것이 핵심입니다.",
-            "이 요리와 함께 제공할 수 있는 좋은 사이드 메뉴는 구운 야채입니다."
-        ]
-        
-        # 요청 메시지에 따른 간단한 응답 로직
-        response_message = ""
-        if "안녕" in message or "hello" in message.lower():
-            response_message = f"안녕하세요, {username}님! 어떤 요리에 대해 알고 싶으신가요?"
-        elif "레시피" in message or "recipe" in message.lower():
-            response_message = "어떤 요리의 레시피가 필요하신가요? 재료와 함께 물어봐주세요."
-        elif "추천" in message or "recommend" in message.lower():
-            response_message = "오늘은 토마토 파스타를 추천드립니다. 신선한 토마토와 바질이 필요합니다."
-        else:
-            response_message = random.choice(ai_responses)
-        
-        # 응답 생성
+        # 고정된 레시피 응답 생성
         response_data = {
             "username": "AI 요리사",
-            "message": response_message,
+            "message": "여기 김치볶음밥 레시피입니다:",
+            "recipeId": 1,  # 레시피 ID 추가
+            "recipe": {
+                "name": "김치볶음밥",
+                "description": "맛있는 한국 전통 김치볶음밥",
+                "ingredients": [
+                    {"name": "김치", "amount": "1컵", "unit": "컵"},
+                    {"name": "밥", "amount": "2", "unit": "공기"},
+                    {"name": "햄", "amount": "50", "unit": "g"},
+                    {"name": "식용유", "amount": "1", "unit": "큰술"},
+                    {"name": "파", "amount": "1", "unit": "뿌리"},
+                    {"name": "계란", "amount": "1", "unit": "개"},
+                    {"name": "참기름", "amount": "1", "unit": "작은술"},
+                    {"name": "깨소금", "amount": "약간", "unit": ""}
+                ],
+                "instructions": [
+                    {"step": 1, "instruction": "김치를 잘게 썬다", "cookingTime": 3},
+                    {"step": 2, "instruction": "팬에 식용유를 두르고 김치를 볶는다", "cookingTime": 5},
+                    {"step": 3, "instruction": "햄을 넣고 함께 볶는다", "cookingTime": 3},
+                    {"step": 4, "instruction": "밥을 넣고 잘 섞어가며 볶는다", "cookingTime": 5},
+                    {"step": 5, "instruction": "파를 넣고 참기름, 깨소금을 뿌려 마무리한다", "cookingTime": 2},
+                    {"step": 6, "instruction": "계란후라이를 올려 완성한다", "cookingTime": 3}
+                ],
+                "totalTime": 21,
+                "difficulty": "쉬움",
+                "servings": 2
+            },
             "imageUrl": image_url
         }
         
@@ -94,7 +95,7 @@ def chat():
     except Exception as e:
         logger.error(f"채팅 처리 중 오류 발생: {str(e)}", exc_info=True)
         return jsonify({"error": str(e)}), 500
-
+    
 # 사용자 정보 저장 엔드포인트
 @app.route('/api/user-info', methods=['POST'])
 def save_user_info():
@@ -180,40 +181,30 @@ def get_nutrition(recipe_id):
     logger.info(f"영양 정보 API 호출됨: ID={recipe_id}")
     
     try:
-        # 임시 영양 정보 데이터
-        nutrition_data = {
-            1: {
+        # 고정된 김치볶음밥 영양 정보
+        if recipe_id == 1:
+            nutrition = {
                 "calories": 450.5,
                 "carbohydrate": 65.3,
-                "protein": 12.8,
-                "fat": 10.5,
-                "sugar": 4.2,
-                "sodium": 420.0,
-                "saturatedFat": 2.1,
-                "transFat": 0.0,
-                "cholesterol": 15.0
-            },
-            2: {
-                "calories": 320.0,
-                "carbohydrate": 15.6,
-                "protein": 22.4,
-                "fat": 15.8,
+                "protein": 15.8,
+                "fat": 14.2,
                 "sugar": 3.5,
-                "sodium": 950.0,
-                "saturatedFat": 5.2,
+                "sodium": 850.0,
+                "saturatedFat": 3.2,
                 "transFat": 0.1,
-                "cholesterol": 45.0
+                "cholesterol": 105.0,
+                "dietaryFiber": 4.2,
+                "potassium": 320.5,
+                "vitaminA": 15.0,  # % 일일 권장량
+                "vitaminC": 22.0,  # % 일일 권장량
+                "calcium": 8.0,    # % 일일 권장량
+                "iron": 10.0       # % 일일 권장량
             }
-        }
-        
-        # 레시피 ID로 영양 데이터 찾기
-        nutrition = nutrition_data.get(recipe_id)
-        if not nutrition:
-            logger.warning(f"영양 정보를 찾을 수 없음: ID={recipe_id}")
+            return jsonify(nutrition)
+        else:
+            logger.warning(f"요청한 레시피 ID({recipe_id})에 대한 영양 정보가 없습니다.")
             return jsonify({"error": "Nutrition data not found"}), 404
-        
-        logger.debug(f"영양 정보 응답: {nutrition}")
-        return jsonify(nutrition)
+            
     except Exception as e:
         logger.error(f"영양 정보 처리 중 오류 발생: {str(e)}", exc_info=True)
         return jsonify({"error": str(e)}), 500
